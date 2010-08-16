@@ -1,0 +1,23 @@
+smutport
+--------
+
+This is a simple SMTP server which simply saves the incoming messages in
+a directory structure of mailboxes:
+
+    mailboxes directory:
+        user1:
+            <someid>.mail
+            <someid>.mail
+            ...
+        user2:
+            <someid>.mail
+            ...
+
+Some other program or web application can parse the .mail files to read
+the mails.
+
+To build smutport you also need lil. Smutport uses lil for configuration.
+
+Kostas "Bad Sector" Michalopoulos
+badsector@runtimeterror.com
+
