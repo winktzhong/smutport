@@ -1,0 +1,41 @@
+# The port to listen to (default 25)
+set port 25000
+
+# The domain to report. You MUST use the valid domain otherwise some agents
+# might refuse to deliver mails!
+set domain localhost
+
+# The full path to the directory which will contain the mailboxes.
+set mailboxes-directory mailboxes
+
+# The greeting to use after the 220 line
+set greeting "smutport mail server is ready"
+
+# Queue size for listen() - this might be capped by the kernel.
+# Default value is 5.
+set listen-queue-size 5
+
+# Maximum length for a single SMTP command. This is set to 1024 by default.
+# Modify this only if you know what you are doing. The minimum value is
+# 512 bytes.
+set max-smpt-command-length 1024
+
+# Maximum length for a single text line in a message. This is set to 1024
+# by default. Modify this only if you know what you are doing. The minimum
+# value is 1001 bytes.
+set max-text-line-length 1024
+
+# A list with the acceptable users. This is used for the accept-user function
+# below. Separate the names with a single space.
+set acceptable-users {badsector komoko}
+
+# This function is called to check if the given user should be accepted by
+# the server or not. The user is only the username (ie. from foo@bar.com this
+# function will only see the foo part). It should return a non-zero integer
+# if the user should be accepted or zero if not.
+func accept-user {user} {
+    foreach $acceptable-users {
+        if [streq $i $user] {return 1}
+    }
+    return 0
+}
