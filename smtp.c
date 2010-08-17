@@ -35,7 +35,7 @@ typedef struct _delivery_status_t
 
 /* A flag that notifies the main listening loop that there are children waiting
  * for attention. */
-static int sigchld_issued;
+static volatile sig_atomic_t sigchld_issued;
 
 /* The listening socket used by the server. */
 socket_t smtp_server_socket;
@@ -691,8 +691,8 @@ int smtp_start_listening(void)
 
         /* if there are children waiting for attention, give them some */
         if (sigchld_issued) {
-            while (waitpid(-1, NULL, WNOHANG) > 0);
             sigchld_issued = 0;
+            while (waitpid(-1, NULL, WNOHANG) > 0);
         }
 
         /* wait for a connection and accept it once it comes */
