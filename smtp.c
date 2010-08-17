@@ -33,16 +33,19 @@ typedef struct _delivery_status_t
     size_t to_size; /* size of the "to" array */
 } delivery_status_t;
 
+/* A flag that notifies the main listening loop that there are children waiting
+ * for attention. */
+static int sigchld_issued;
+
+/* The listening socket used by the server. */
 socket_t smtp_server_socket;
 
 /*
- * SIGCHLD handler. Simply waits for all children to do report something or
- * returns if nothing is to be reported. This is used to avoid having the
- * kernel keep children around as zombies.
+ * SIGCHLD handler. Simply raises the sigchld_issued flag.
  */
 static void sigchld_handler(int s)
 {
-    while (waitpid(-1, NULL, WNOHANG) > 0);
+    sigchld_issued = 1;
 }
 
 /*
@@ -685,6 +688,12 @@ int smtp_start_listening(void)
         struct sockaddr_storage client_addr;
         socklen_t client_addr_size = sizeof(client_addr);
         int r;
+
+        /* if there are children waiting for attention, give them some */
+        if (sigchld_issued) {
+            while (waitpid(-1, NULL, WNOHANG) > 0);
+            sigchld_issued = 0;
+        }
 
         /* wait for a connection and accept it once it comes */
         socket_t client_socket = accept(smtp_server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
