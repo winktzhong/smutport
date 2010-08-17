@@ -503,11 +503,11 @@ static void parse_smtp_command(socket_t socket, delivery_status_t* delst, const 
             sprintf(full, "250 %s@%s\r\n", field, domain);
             send_string(socket, full);
             free(full);
-            goto done;
         } else {
             /* unknown user, but let's assume its ok */
             send_string(socket, "252 I couldn't find the user around, but anyway we're all friends here aren't we?\r\n");
         }
+        goto done;
     }
     if (!strcmp(base_cmd, "data")) {
         /* DATA issued, let's gather said data! */
